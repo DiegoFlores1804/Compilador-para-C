@@ -1,2 +1,2 @@
 # Alphax
-Compiler
+Developed in Elixir
