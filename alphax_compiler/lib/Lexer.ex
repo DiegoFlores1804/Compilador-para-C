@@ -1,6 +1,6 @@
 defmodule Lexer do
   def lexer(lexicon, column) do
-
+    #Token list structure
     tokenList = [
       {:type, :intKeyWord},
       {:ident, :returnKeyWord},

@@ -107,7 +107,7 @@ defmodule Parser do
   end
 
 
-  # look for returnkeyword and semicolon
+  # Look for returnKeyword and semicolon
   def parse_statement(nextToken, tokenListF) do
     if nextToken == :returnKeyWord do   #Find returnkeyword
       tokenListF = List.delete_at(tokenListF, 0)

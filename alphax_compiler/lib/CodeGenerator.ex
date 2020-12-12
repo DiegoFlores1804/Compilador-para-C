@@ -39,7 +39,7 @@ defmodule CodeGenerator do
       code_snippet                           #concatenates with assembler code.
   end
 
-  #When fisrt parameter is return node
+  #When first parameter is return node
   def emit_code(:return, code_snippet, _) do
     """
         movl    #{code_snippet}, %rax

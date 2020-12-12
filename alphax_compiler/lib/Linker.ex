@@ -9,7 +9,7 @@ defmodule Linker do
 
     File.write!(assembly_path, assembler) #write assembler code in file.s
     System.cmd("gcc", [binary_file_name <> ".c", "-o#{binary_file_name}"], cd: output_dir_name) #gcc compile the file and create executable
-    IO.puts("Assembly code Generated : #{assembly_path}")
+    IO.puts("Assembly code Generated : #{assembly_path}") #Confirmation of the file generation
     IO.puts("Exectutable generated: #{output_dir_name}" <> "/" <> "#{binary_file_name}")
   end
 
@@ -23,7 +23,7 @@ defmodule Linker do
 
     File.write!(file_path, assembler) #write assembler code in file.s
     System.cmd("gcc", [binary_file_name <> ".c", "-o#{name}"], cd: output_dir_name)#gcc compile the file and create executable
-    IO.puts("Assembly generated : #{file_path}")
+    IO.puts("Assembly generated : #{file_path}") #Confirmation of the file generation
     IO.puts("Executable generated : #{output_dir_name}" <> "/" <> "#{name}")
 
   end
