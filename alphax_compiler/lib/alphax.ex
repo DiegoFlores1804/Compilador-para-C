@@ -24,7 +24,7 @@ defmodule Alphax do
         ast = Parser.parse_program(tokens)
         IO.inspect(ast)
 
-      # Show Ass.code
+      # Show Assebly code
       ["-s", path] ->
         IO.puts("Assembly code\n\n\n\n")
         tokens = Lexer.lexing(File.read!(path))
