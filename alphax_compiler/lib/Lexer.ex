@@ -1,6 +1,6 @@
 defmodule Lexer do
   def lexer(lexicon, column) do
-    #Token list structure
+
     tokenList = [
       {:type, :intKeyWord},
       {:ident, :returnKeyWord},
@@ -10,6 +10,12 @@ defmodule Lexer do
       {:lParen},
       {:rParen},
       {:semicolon},
+      {:operator, :negation},
+      {:operator, :logicalN},
+      {:operator, :bitW},
+      {:operator, :multiplication},
+      {:operator, :addition},
+      {:operator, :division}
     ]
     # Token list to be mapped and compared to the file .c token to the keywords list
     convKey = fn a -> {tokenToStr(a), a} end
@@ -87,7 +93,7 @@ defmodule Lexer do
       {:type, :intKeyWord} ->
         "int "                 # is it an int
       {:ident, :returnKeyWord} ->
-         "return "             #  return
+        "return "             #  return
       {:ident, :mainKeyWord} ->
         "main"                 #  main
       {:lBrace} ->             # Syntax characters
@@ -100,6 +106,21 @@ defmodule Lexer do
          ")"
       {:semicolon} ->
         ";"
+      #Second - Delivery (unary operators)
+      {:operator, :negation} ->
+        "-"
+      {:operator, :logicalN} ->
+        "!"
+      {:operator, :bitW} ->
+        "~"
+
+      #Third - Delivery (binary operators)
+      {:operator, :multiplication} ->
+        "*"
+      {:operator, :addition} ->
+        "+"
+      {:operator, :division} ->
+        "/"
     end
   end
 
