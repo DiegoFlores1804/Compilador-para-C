@@ -107,7 +107,7 @@ defmodule Parser do
   end
 
 
-  # Look for returnKeyword and semicolon
+  # look for returnkeyword and semicolon
   def parse_statement(nextToken, tokenListF) do
     if nextToken == :returnKeyWord do   #Find returnkeyword
       tokenListF = List.delete_at(tokenListF, 0)
@@ -133,9 +133,14 @@ defmodule Parser do
     end
   end
 
+  def parse_expression(tokenListF) do
+    binary = parse_bin(tokenListF)
+    binary
+  end
+
 
    #Only verify a constant expression
-   def parse_expression(tokenListF) do
+  def parse_f(tokenListF) do
     nextToken = next(tokenListF) #take next token in the tuple(expected constant)
     element = Tuple.to_list(hd(tokenListF)) #Converted token in list
     newTokens = List.last(element) #take last element in list
@@ -147,13 +152,160 @@ defmodule Parser do
         tokenListF = List.delete_at(tokenListF, 0)
         {%AST{node_name: :constant, value: numero}, tokenListF} #add new node in AST (constant)
 
+      {:lParen, []} ->
+        tokenListF = List.delete_at(tokenListF, 0)
+        expression = parse_expression(tokenListF)
+
+        case expression do
+          {{:error, error_message}, tokenListF} ->
+            {{:error, error_message}, tokenListF}
+
+          {expression_node, tokenListF} ->
+            [nextToken | rest] = tokenListF
+            element = Tuple.to_list(nextToken)
+            newTokens = List.first(element)
+            if newTokens == :rParen do
+              {expression_node, rest}
+            else
+              sec_expression = parse_expression(tokenListF)
+              {node_expression, _} = expression
+              {node, rest} = sec_expression
+              [_ | no_OpenParent_list] = rest
+              [%{node_expression | left_node: node}, no_OpenParent_list]
+            end
+        end
+      {:operator, _} ->
+        unary(tokenListF)
       _ ->
         line = line(tokenListF)
-        {{:error, "ERROR AT #{line}: expect an int value"}, tokenListF}
+        {{:error, "ERROR AT #{line}: expected an int value"}, tokenListF}
     end
-
-
   end
 
+
+  def unary(tokenListF) do
+    nextToken = next(tokenListF)
+    first = Tuple.to_list(hd(tokenListF))
+    test = List.last(first)
+
+    case {nextToken, test} do
+      {:operator, [:negation]} ->
+        tokenListF = List.delete_at(tokenListF, 0)
+
+        {tree, last} = parse_expression(tokenListF)
+
+        case {tree, last} do
+          {{:error, error_message}, tokenListF} ->
+            {{:error, error_message}, tokenListF}
+
+          _ -> {%AST{node_name: :unary, value: :negation, left_node: tree}, last}
+        end
+    {:operator, [:logicalN]} ->
+      tokenListF = List.delete_at(tokenListF, 0)
+      {tree, last} = parse_expression(tokenListF)
+      case {tree, last} do
+        {{:error, error_message}, tokenListF} ->
+          {{:error, error_message}, tokenListF}
+        _ -> {%AST{node_name: :unary, value: :logicalN, left_node: tree}, last}
+      end
+    {:operator, [:bitW]} ->
+      tokenListF = List.delete_at(tokenListF, 0)
+      {tree, last} = parse_expression(tokenListF)
+
+      case {tree, last} do
+        {{:error, error_message}, tokenListF} ->
+          {{:error, error_message}, tokenListF}
+        _ -> {%AST{node_name: :unary, value: :bitW, left_node: tree}, last}
+      end
+      _ ->
+        line = line(tokenListF)
+        {{:error, "***** ERROR 404 at #{line}: expect an unary operator"}, tokenListF}
+    end
+  end
+
+#THIRD DELIVERY
+  def parse_bin(tokenListF) do
+    term = parse_term(tokenListF)
+    {expression_m, rest} = term
+    [nextToken | rest] = rest
+
+
+    first = Tuple.to_list(nextToken)
+    element = List.last(first)
+
+    case term do
+      {{:error, error_message}, tokenListF} ->
+        {{:error, error_message}, tokenListF}
+
+      _ ->
+        case element do
+          [:addition] ->
+            term_op = parse_expression(rest)
+
+            case term_op do
+              {{:error, error_message}, tokenListF} ->
+                {{:error, error_message}, tokenListF}
+              _ ->
+                {node, tokenListF} = term_op
+                {%AST{node_name: :binary, value: :addition, left_node: expression_m, right_node: node}, tokenListF}
+            end
+          [:negation] ->
+            term_op = parse_expression(rest)
+
+            case term_op do
+              {{:error, error_message}, tokenListF} ->
+                {{:error, error_message}, tokenListF}
+              _->
+                {node, tokenListF} = term_op
+                {%AST{node_name: :binary, value: :negation, left_node: expression_m, right_node: node}, tokenListF}
+            end
+            _->
+              term
+        end
+    end
+  end
+
+  def parse_term(tokenListF) do
+    factor = parse_f(tokenListF)
+
+    {expression_n, rest} = factor
+    [nextToken | _] = rest
+
+    first = Tuple.to_list(nextToken)
+    element = List.last(first)
+
+    case factor do
+      {{:error, error_message}, tokenListF} ->
+        {{:error, error_message}, tokenListF}
+
+      _ ->
+        case element do
+          [:multiplication] ->
+            tokenListF = List.delete_at(rest, 0)
+            term_op = parse_expression(tokenListF)
+
+            case term_op do
+              {{:error, error_message}, tokenListF} ->
+                {{:error, error_message}, tokenListF}
+
+              _ ->
+                {node, tokenListF} = term_op
+                {%AST{node_name: :binary, value: :multiplication, left_node: expression_n, right_node: node}, tokenListF}
+            end
+          [:division] ->
+            tokenListF = List.delete_at(rest, 0)
+            term_op = parse_expression(tokenListF)
+            case term_op do
+              {{:error, error_message}, tokenListF} ->
+                {{:error, error_message}, tokenListF}
+              _ ->
+                {node, tokenListF} = term_op
+                {%AST{node_name: :binary, value: :division, left_node: expression_n, right_node: node}, tokenListF}
+            end
+            _ ->
+              factor
+        end
+    end
+  end
 
 end
