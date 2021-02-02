@@ -304,5 +304,311 @@ defmodule LexerTest do
             ]
   end
 
+  #Binary operators
+
+  test "add" do
+    testList = Lexer.lexing(File.read!("test/pruebas/add.c"))
+    assert testList == [
+              {:type, 1, [:intKeyWord]},
+              {:ident, 1, [:mainKeyWord]},
+              {:lParen, 1, []},
+              {:rParen, 1, []},
+              {:lBrace, 1, []},
+              {:ident, 2, [:returnKeyWord]},
+              {:num, 2, 1},
+              {:operator, 2, [:addition]},
+              {:num, 2, 2},
+              {:semicolon, 2, []},
+              {:rBrace, 3, []}
+    ]
+  end
+
+  test "associativity" do
+    testList = Lexer.lexing(File.read!("test/pruebas/associativity.c"))
+    assert testList == [
+              {:type, 1, [:intKeyWord]},
+              {:ident, 1, [:mainKeyWord]},
+              {:lParen, 1, []},
+              {:rParen, 1, []},
+              {:lBrace, 1, []},
+              {:ident, 2, [:returnKeyWord]},
+              {:num, 2, 1},
+              {:operator, 2, [:negation]},
+              {:num, 2, 2},
+              {:operator, 2, [:negation]},
+              {:num, 2, 3},
+              {:semicolon, 2, []},
+              {:rBrace, 3, []}
+
+    ]
+  end
+
+  test "associativity 2" do
+    testList = Lexer.lexing(File.read!("test/pruebas/associativity_2.c"))
+    assert testList == [
+              {:type, 1, [:intKeyWord]},
+              {:ident, 1, [:mainKeyWord]},
+              {:lParen, 1, []},
+              {:rParen, 1, []},
+              {:lBrace, 1, []},
+              {:ident, 2, [:returnKeyWord]},
+              {:num, 2, 6},
+              {:operator, 2, [:division]},
+              {:num, 2, 3},
+              {:operator, 2, [:division]},
+              {:num, 2, 2},
+              {:semicolon, 2, []},
+              {:rBrace, 3, []}
+
+    ]
+  end
+
+  test "div" do
+    testList = Lexer.lexing(File.read!("test/pruebas/div.c"))
+    assert testList == [
+              {:type, 1, [:intKeyWord]},
+              {:ident, 1, [:mainKeyWord]},
+              {:lParen, 1, []},
+              {:rParen, 1, []},
+              {:lBrace, 1, []},
+              {:ident, 2, [:returnKeyWord]},
+              {:num, 2, 4},
+              {:operator, 2, [:division]},
+              {:num, 2, 2},
+              {:semicolon, 2, []},
+              {:rBrace, 3, []}
+
+    ]
+  end
+
+  test "div neg" do
+    testList = Lexer.lexing(File.read!("test/pruebas/div_neg.c"))
+    assert testList == [
+              {:type, 1, [:intKeyWord]},
+              {:ident, 1, [:mainKeyWord]},
+              {:lParen, 1, []},
+              {:rParen, 1, []},
+              {:lBrace, 1, []},
+              {:ident, 2, [:returnKeyWord]},
+              {:lParen, 2, []},
+              {:operator, 2, [:negation]},
+              {:num, 2, 12},
+              {:rParen, 2, []},
+              {:operator, 2, [:division]},
+              {:num, 2, 5},
+              {:semicolon, 2, []},
+              {:rBrace, 3, []}
+
+    ]
+  end
+
+  test "mult" do
+    testList = Lexer.lexing(File.read!("test/pruebas/mult.c"))
+    assert testList == [
+              {:type, 1, [:intKeyWord]},
+              {:ident, 1, [:mainKeyWord]},
+              {:lParen, 1, []},
+              {:rParen, 1, []},
+              {:lBrace, 1, []},
+              {:ident, 2, [:returnKeyWord]},
+              {:num, 2, 2},
+              {:operator, 2, [:multiplication]},
+              {:num, 2, 3},
+              {:semicolon, 2, []},
+              {:rBrace, 3, []}
+
+    ]
+  end
+
+  test "parens" do
+    testList = Lexer.lexing(File.read!("test/pruebas/parens.c"))
+    assert testList == [
+
+              {:type, 1, [:intKeyWord]},
+              {:ident, 1, [:mainKeyWord]},
+              {:lParen, 1, []},
+              {:rParen, 1, []},
+              {:lBrace, 1, []},
+              {:ident, 2, [:returnKeyWord]},
+              {:num, 2, 2},
+              {:operator, 2, [:multiplication]},
+              {:lParen, 2, []},
+              {:num, 2, 3},
+              {:operator, 2, [:addition]},
+              {:num, 2, 4},
+              {:rParen, 2, []},
+              {:semicolon, 2, []},
+              {:rBrace, 3, []}
+    ]
+  end
+
+  test "precedence" do
+    testList = Lexer.lexing(File.read!("test/pruebas/precedence.c"))
+    assert testList == [
+              {:type, 1, [:intKeyWord]},
+              {:ident, 1, [:mainKeyWord]},
+              {:lParen, 1, []},
+              {:rParen, 1, []},
+              {:lBrace, 1, []},
+              {:ident, 2, [:returnKeyWord]},
+              {:num, 2, 2},
+              {:operator, 2, [:addition]},
+              {:num, 2, 3},
+              {:operator, 2, [:multiplication]},
+              {:num, 2, 4},
+              {:semicolon, 2, []},
+              {:rBrace, 3, []}
+      ]
+    end
+
+  test "sub" do
+    testList = Lexer.lexing(File.read!("test/pruebas/sub.c"))
+    assert testList == [
+              {:type, 1, [:intKeyWord]},
+              {:ident, 1, [:mainKeyWord]},
+              {:lParen, 1, []},
+              {:rParen, 1, []},
+              {:lBrace, 1, []},
+              {:ident, 2, [:returnKeyWord]},
+              {:num, 2, 1},
+              {:operator, 2, [:negation]},
+              {:num, 2, 2},
+              {:semicolon, 2, []},
+              {:rBrace, 3, []}
+      ]
+    end
+
+  test "sub_neg" do
+    testList = Lexer.lexing(File.read!("test/pruebas/sub_neg.c"))
+    assert testList == [
+              {:type, 1, [:intKeyWord]},
+              {:ident, 1, [:mainKeyWord]},
+              {:lParen, 1, []},
+              {:rParen, 1, []},
+              {:lBrace, 1, []},
+              {:ident, 2, [:returnKeyWord]},
+              {:num, 2, 2},
+              {:operator, 2, [:negation]},
+              {:operator, 2, [:negation]},
+              {:num, 2, 1},
+              {:semicolon, 2, []},
+              {:rBrace, 3, []}
+
+      ]
+    end
+
+    test "unop add" do
+      testList = Lexer.lexing(File.read!("test/pruebas/unop_add.c"))
+      assert testList == [
+              {:type, 1, [:intKeyWord]},
+              {:ident, 1, [:mainKeyWord]},
+              {:lParen, 1, []},
+              {:rParen, 1, []},
+              {:lBrace, 1, []},
+              {:ident, 2, [:returnKeyWord]},
+              {:operator, 2, [:bitW]},
+              {:num, 2, 2},
+              {:operator, 2, [:addition]},
+              {:num, 2, 3},
+              {:semicolon, 2, []},
+              {:rBrace, 3, []}
+
+        ]
+      end
+
+      test "unop parens" do
+        testList = Lexer.lexing(File.read!("test/pruebas/unop_parens.c"))
+        assert testList == [
+              {:type, 1, [:intKeyWord]},
+              {:ident, 1, [:mainKeyWord]},
+              {:lParen, 1, []},
+              {:rParen, 1, []},
+              {:lBrace, 1, []},
+              {:ident, 2, [:returnKeyWord]},
+              {:operator, 2, [:bitW]},
+              {:lParen, 2, []},
+              {:num, 2, 1},
+              {:operator, 2, [:addition]},
+              {:num, 2, 1},
+              {:rParen, 2, []},
+              {:semicolon, 2, []},
+              {:rBrace, 3, []}
+
+          ]
+        end
+
+        #Binary operators (test to fail)
+
+        test "malformed paren" do
+        testList = Lexer.lexing(File.read!("test/pruebas/malformed_paren.c"))
+        assert testList == [
+              {:type, 1, [:intKeyWord]},
+              {:ident, 1, [:mainKeyWord]},
+              {:lParen, 1, []},
+              {:rParen, 1, []},
+              {:lBrace, 1, []},
+              {:ident, 2, [:returnKeyWord]},
+              {:num, 2, 2},
+              {:lParen, 2, []},
+              {:operator, 2, [:negation]},
+              {:num, 2, 3},
+              {:rParen, 2, []},
+              {:semicolon, 2, []},
+              {:rBrace, 3, []}
+        ]
+      end
+
+        test "No semicolon 2" do
+          testList = Lexer.lexing(File.read!("test/pruebas/no_semicolon2.c "))
+          assert testList ==[
+              {:type, 1, [:intKeyWord]},
+              {:ident, 1, [:mainKeyWord]},
+              {:lParen, 1, []},
+              {:rParen, 1, []},
+              {:lBrace, 1, []},
+              {:ident, 2, [:returnKeyWord]},
+              {:num, 2, 2},
+              {:operator, 2, [:multiplication]},
+              {:num, 2, 2},
+              {:rBrace, 3, []}
+
+          ]
+        end
+
+        test "missing first operator" do
+          testList = Lexer.lexing(File.read!("test/pruebas/missing_first_op.c"))
+          assert testList == [
+              {:type, 1, [:intKeyWord]},
+              {:ident, 1, [:mainKeyWord]},
+              {:lParen, 1, []},
+              {:rParen, 1, []},
+              {:lBrace, 1, []},
+              {:ident, 2, [:returnKeyWord]},
+              {:operator, 2, [:division]},
+              {:num, 2, 3},
+              {:semicolon, 2, []},
+              {:rBrace, 3, []}
+
+          ]
+        end
+
+        test "missing second op" do
+          testList = Lexer.lexing(File.read!("test/pruebas/missing_second_op.c"))
+          assert testList == [
+              {:type, 1, [:intKeyWord]},
+              {:ident, 1, [:mainKeyWord]},
+              {:lParen, 1, []},
+              {:rParen, 1, []},
+              {:lBrace, 1, []},
+              {:ident, 2, [:returnKeyWord]},
+              {:num, 2, 1},
+              {:operator, 2, [:addition]},
+              {:semicolon, 2, []},
+              {:rBrace, 3, []}
+          ]
+        end
+
+
+
 
 end
