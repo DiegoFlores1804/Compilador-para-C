@@ -134,10 +134,41 @@ defmodule Parser do
   end
 
   def parse_expression(tokenListF) do
-    binary = parse_bin(tokenListF)
-    binary
-  end
+    # binary = parse_bin(tokenListF)
+    # binary
+    logical = parse_logicalAND(tokenListF)
+    {expression_node, rest} = logical
+    [nextToken | rest] = rest
+    first = Tuple.to_list(nextToken)
+    test = List.last(first)
 
+    case logical do
+      {{:error, error_message}, tokenListF} ->
+        {{:error, error_message}, tokenListF}
+
+      _->
+        case test do
+          [:logicalOR] ->
+            term_op = parse_expression(rest)
+            case term_op do
+              {{:error, error_message}, tokenListF} ->
+                {{:error, error_message}, tokenListF}
+
+              _->
+                {node, tokenListF} = term_op
+                {%AST{node_name: :binary, value: :logicalOR, left_node: expression_node, right_node: node}, tokenListF}
+            end
+              _->
+                case logical do
+                  {{:error, error_message}, tokenListF} ->
+                    {{:error, error_message}, tokenListF}
+                _ ->
+                  logical
+                end
+                logical
+            end
+        end
+    end
 
    #Only verify a constant expression
   def parse_f(tokenListF) do
@@ -308,4 +339,141 @@ defmodule Parser do
     end
   end
 
+#FOURTH DELIVERY
+  def parse_logicalAND(tokenListF) do
+    equal = parse_equalEx(tokenListF)
+    {expression_node, rest} = equal
+    [nextToken | rest ] = rest
+    first = Tuple.to_list(nextToken)
+    test = List.last(first)
+
+    case equal do
+      {{:error, error_message}, tokenListF} ->
+        {{:error, error_message}, tokenListF}
+
+      _->
+        case test do
+          [:logicalAND] ->
+            term_op = parse_expression(rest)
+            case term_op do
+              {{:error, error_message}, tokenListF} ->
+                {{:error, error_message}, tokenListF}
+
+              _->
+                {node, tokenListF} = term_op
+                {%AST{node_name: :binary, value: :logicalAND, left_node: expression_node, right_node: node}, tokenListF}
+            end
+        _->
+          equal
+        end
+    end
+  end
+
+  def parse_equalEx(tokenListF) do
+    relational = parse_relatExp(tokenListF)
+    {expression_node, rest} = relational
+    [nextToken | rest] = rest
+    first = Tuple.to_list(nextToken)
+    test = List.last(first)
+
+    case relational do
+      {{:error, error_message}, tokenListF} ->
+        {{:error, error_message}, tokenListF}
+
+      _->
+        case test do
+          [:equalTo] ->
+            term_op = parse_expression(rest)
+            case term_op do
+              {{:error, error_message}, tokenListF} ->
+                {{:error, error_message}, tokenListF}
+
+              _->
+                {node, tokenListF} = term_op
+                {%AST{node_name: :binary, value: :equalTo, left_node: expression_node, right_node: node}, tokenListF}
+
+            end
+          [:nEqualTo] ->
+            term_op = parse_expression(rest)
+
+              case term_op do
+                {{:error, error_message}, tokenListF} ->
+                  {{:error, error_message}, tokenListF}
+
+                _->
+                  {node, tokenListF} = term_op
+                  {%AST{node_name: :binary, value: :nEqualTo, left_node: expression_node, right_node: node}, tokenListF}
+              end
+          _->
+            relational
+      end
+    end
+  end
+
+  #relational_Expressions_Fourth_Delivery
+
+  def parse_relatExp(tokenListF) do
+    binary = parse_bin(tokenListF)
+    {expression_node, rest} = binary
+    [nextToken | rest ] = rest
+    first = Tuple.to_list(nextToken)
+    test = List.last(first)
+
+    case binary do
+      {{:error, error_message}, tokenListF} ->
+        {{:error, error_message}, tokenListF}
+
+      _->
+        case test do
+          [:lessThan] ->
+            term_op = parse_expression(rest)
+
+            case term_op do
+              {{:error, error_message}, tokenListF} ->
+                {{:error, error_message}, tokenListF}
+
+                _->
+                  {node, tokenListF} = term_op
+                  {%AST{node_name: :binary, value: :lessThan, left_node: expression_node, right_node: node}, tokenListF}
+            end
+          [:lessOrEqualTo] ->
+            term_op = parse_expression(rest)
+
+            case term_op do
+              {{:error, error_message}, tokenListF} ->
+                {{:error, error_message}, tokenListF}
+
+
+              _->
+                {node, tokenListF} = term_op
+                {%AST{node_name: :binary, value: :lessOrEqualTo, left_node: expression_node, right_node: node}, tokenListF}
+            end
+          [:greaterThan] ->
+            term_op = parse_expression(rest)
+
+            case term_op do
+              {{:error, error_message}, tokenListF} ->
+                {{:error, error_message}, tokenListF}
+
+            _->
+              {node, tokenListF} = term_op
+              {%AST{node_name: :binary, value: :greaterThan, left_node: expression_node, right_node: node}, tokenListF}
+            end
+          [:greaterThanOrEqualTo] ->
+            term_op = parse_expression(rest)
+
+            case term_op do
+              {{:error, error_message}, tokenListF} ->
+                {{:error, error_message}, tokenListF}
+
+              _->
+                {node, tokenListF} = term_op
+                {%AST{node_name: :binary, value: :greaterThanOrEqualTo, left_node: expression_node, right_node: node}, tokenListF}
+            end
+
+          _->
+            binary
+        end
+    end
+  end
 end

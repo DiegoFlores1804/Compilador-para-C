@@ -10,13 +10,24 @@ defmodule Lexer do
       {:lParen},
       {:rParen},
       {:semicolon},
+      #Second Delivery
       {:operator, :negation},
       {:operator, :logicalN},
       {:operator, :bitW},
+      #Thrid Delivery
       {:operator, :multiplication},
       {:operator, :addition},
-      {:operator, :division}
-    ]
+      {:operator, :division},
+      #Fourth Delivery
+      {:operator, :logicalAND},
+      {:operator, :logicalOR},
+      {:operator, :equalTo},
+      {:operator, :nEqualTo},
+      {:operator, :lessThan},
+      {:operator, :lessOrEqualTo},
+      {:operator, :greaterThan},
+      {:operator, :greaterThanOrEqualTo}
+      ]
     # Token list to be mapped and compared to the file .c token to the keywords list
     convKey = fn a -> {tokenToStr(a), a} end
     newkeywords=Enum.map(tokenList,convKey) #new token list with strings (string before token)
@@ -91,7 +102,7 @@ defmodule Lexer do
       {:string, str} ->
         str                    #Strings no need convert, they are return
       {:type, :intKeyWord} ->
-        "int "                 # is it an int
+        "int "                 # it is an int
       {:ident, :returnKeyWord} ->
         "return "             #  return
       {:ident, :mainKeyWord} ->
@@ -110,7 +121,7 @@ defmodule Lexer do
       {:operator, :negation} ->
         "-"
       {:operator, :logicalN} ->
-        "!"
+        "! "
       {:operator, :bitW} ->
         "~"
 
@@ -121,6 +132,24 @@ defmodule Lexer do
         "+"
       {:operator, :division} ->
         "/"
+
+      #Fourth - Delivery (even more binary operators)
+      {:operator, :logicalAND} ->
+        "&&"
+      {:operator, :logicalOR} ->
+        "||"
+      {:operator, :equalTo} ->
+        "=="
+      {:operator, :nEqualTo} ->
+        "!="
+      {:operator, :lessThan} ->
+        "< "
+      {:operator, :lessOrEqualTo} ->
+        "<="
+      {:operator, :greaterThan} ->
+        "> "
+      {:operator, :greaterThanOrEqualTo} ->
+        ">="
     end
   end
 

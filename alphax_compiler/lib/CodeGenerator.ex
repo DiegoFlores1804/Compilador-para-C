@@ -67,6 +67,7 @@ defmodule CodeGenerator do
     """
   end
 
+  #for unary operators
   def emit_code(:unary, code_snippet, :negation) do
     code_snippet <>
     """
@@ -89,6 +90,7 @@ defmodule CodeGenerator do
     """
   end
 
+  #for binary operators
   def emit_code(:binary, code_snippet, :addition) do
     code_snippet <>
     """
@@ -123,25 +125,131 @@ defmodule CodeGenerator do
     """
   end
 
-   def pushOp(ast_node) do
-     if ast_node.node_name == :unary and ast_node.value == :negation and ast_node.right_node == nil do
-       """
-           _NEG
-       """
-     else
-       """
-           push   %rax
-       """
-     end
-   end
+  #For even more binary operators
+  def emit_code(:binary, code_snippet, :logicalAND) do
+    first = Regex.scan(~r/clause_and\d{1,}/, code_snippet)
+    second = Regex.scan(~r/clause_and\d{1,}/, code_snippet)
+    num = Integer.to_string(length(first) + length(second) + 1)
 
-   def popOp(ast_node) do
-     if ast_node.node_name == :unary and ast_node.value == :negation and ast_node.right_node == nil do
-       ""
-     else
-       """
-           pop   %rbx
-       """
-     end
-   end
+    code_snippet <>
+    """
+        cmp   $0, %rax
+        jne   clause_and#{num}
+        jmp   end_and#{num}
+      clause_and#{num}:
+        cmp   $0,  %rax
+        mov   $0,  %rax
+        setne      %al
+      end_and#{num}:
+    """
+  end
+
+  def emit_code(:binary, code_snippet, :logicalOR) do
+    first = Regex.scan(~r/clause_or\d{1,}/, code_snippet)
+    second = Regex.scan(~r/clause_or\d{1,}/, code_snippet)
+    num = Integer.to_string(length(first) + length(second) + 1)
+
+    code_snippet <>
+    """
+        cmp   $0,  %rax
+        je clause_or#{num}
+        mov   $1,  %rax
+        jmp   end_or#{num}:
+      clause_or#{num}:
+        cmp   $0, %rax
+        mov   $0, %rax
+        setne     %al
+      end_or#{num}:
+
+    """
+  end
+
+  def emit_code(:binary, code_snippet, :equalTo) do
+    code_snippet <>
+    """
+        push   %rax
+        pop    %rbx
+        cmp    %rax, %rbx
+        mov    $0,   %rax
+        sete   %al
+    """
+  end
+
+  def emit_code(:binary, code_snippet, :nEqualTo) do
+    code_snippet <>
+    """
+        push   %rax
+        pop    %rbx
+        cmp    %rax, %rbx
+        mov    $0, %rax
+        setne  %al
+    """
+  end
+
+  def emit_code(:binary, code_snippet, :lessThan) do
+    code_snippet <>
+    """
+        push   %rax
+        pop    %rbx
+        cmp    %rax, %rbx
+        mov    $0, %rax
+        setl   %al
+    """
+  end
+
+  def emit_code(:binary, code_snippet, :lessOrEqualTo) do
+    code_snippet <>
+    """
+        push   %rax
+        pop    %rbx
+        cmp    %rax, %rbx
+        mov    $0, %rax
+        setle  %al
+    """
+  end
+
+  def emit_code(:binary, code_snippet, :greaterThan) do
+    code_snippet <>
+    """
+        push   %rax
+        pop    %rbx
+        cmp    %rax, %rbx
+        mov    $0
+        setg   %al
+    """
+  end
+
+  def emit_code(:binary, code_snippet, :greaterThanOrEqualTo) do
+    code_snippet <>
+    """
+        push   %rax
+        pop    %rbx
+        cmp    %rax, %rbx
+        mov    $0, %rax
+        setge  %al
+    """
+  end
+
+  #secondary_functions
+  def pushOp(ast_node) do
+    if ast_node.node_name == :unary and ast_node.value == :negation and ast_node.right_node == nil do
+      """
+          _NEG
+      """
+    else
+      """
+          push   %rax
+      """
+    end
+  end
+
+  def popOp(ast_node) do
+    if ast_node.node_name == :unary and ast_node.value == :negation and ast_node.right_node == nil do
+      ""
+    else
+      """
+          pop    %rbx
+      """
+    end
+  end
 end
