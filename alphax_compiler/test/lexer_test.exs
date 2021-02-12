@@ -572,7 +572,7 @@ defmodule LexerTest do
   end
 
   test "No semicolon 2" do
-    testList = Lexer.lexing(File.read!("test/pruebas/no_semicolon2.c "))
+    testList = Lexer.lexing(File.read!("test/pruebas/no_semicolon2.c"))
 
     assert testList == [
              {:type, 1, [:intKeyWord]},
